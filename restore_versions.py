@@ -1,5 +1,6 @@
 import os
 import subprocess
+from datetime import datetime
 
 # コミット履歴を取得
 def get_commits():
@@ -9,9 +10,18 @@ def get_commits():
     )
     return [line.split(" ") for line in result.stdout.strip().split("\n")]
 
+# 2024年12月27日以降のコミットはプッシュしない
+def is_after_cutoff(commit_date, cutoff_date="2024-12-27"):
+    return datetime.strptime(commit_date, "%Y-%m-%d") > datetime.strptime(cutoff_date, "%Y-%m-%d")
+
 # 各コミットをブランチ化して整理
 def process_commits(commits):
     for commit_id, commit_date in commits:
+        # 2024年12月27日以降のコミットはプッシュしない
+        if is_after_cutoff(commit_date):
+            print(f"❌ Skipping commit {commit_id} from {commit_date}: After cutoff date.")
+            continue
+
         branch_name = f"version-{commit_date}"
         folder_path = f"versions/{branch_name}"
 
@@ -39,7 +49,7 @@ def process_commits(commits):
 
         # main/master に戻る
         subprocess.run(["git", "checkout", "main"])
-    
+
 if __name__ == "__main__":
     commits = get_commits()
     process_commits(commits)
