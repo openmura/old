@@ -1,5 +1,6 @@
 import os
 import subprocess
+from datetime import datetime
 
 # コミット履歴を取得
 def get_commits():
@@ -9,9 +10,24 @@ def get_commits():
     )
     return [line.split(" ") for line in result.stdout.strip().split("\n")]
 
+# 現在～2024年12月27日以降のコミットは処理しない
+def is_before_cutoff(commit_date, cutoff_date="2024-12-27"):
+    # 現在の日付と比較
+    current_date = datetime.now()
+    cutoff_datetime = datetime.strptime(cutoff_date, "%Y-%m-%d")
+    return datetime.strptime(commit_date, "%Y-%m-%d") < cutoff_datetime and datetime.strptime(commit_date, "%Y-%m-%d") <= current_date
+
 # 各コミットをブランチ化して整理
 def process_commits(commits):
+    # ローカルの変更をまとめてコミットするために一時的なフラグを使う
+    commit_messages = []
+
     for commit_id, commit_date in commits:
+        # 現在～2024年12月27日以降のコミットは処理しない
+        if not is_before_cutoff(commit_date):
+            print(f"❌ Skipping commit {commit_id} from {commit_date}: After cutoff date.")
+            continue
+
         branch_name = f"version-{commit_date}"
         folder_path = f"versions/{branch_name}"
 
@@ -23,27 +39,37 @@ def process_commits(commits):
             print(f"❌ Skipping {commit_id}: Commit not found")
             continue
 
-        # ブランチ作成
-        subprocess.run(["git", "checkout", "-b", branch_name, commit_id])
+        # ブランチ作成（すでに存在する場合は切り替え）
+        result = subprocess.run(["git", "branch", "--list", branch_name], capture_output=True)
+        if result.returncode == 0 and result.stdout.strip():
+            print(f"⚠️ Branch {branch_name} already exists. Switching to it...")
+            
+            # 現在の変更をコミットまたはstashしてからブランチを切り替え
+            subprocess.run(["git", "add", "."])
+            subprocess.run(["git", "commit", "-m", "Save changes before switching branches"])
+            
+            subprocess.run(["git", "checkout", branch_name])
+        else:
+            subprocess.run(["git", "checkout", "-b", branch_name, commit_id])
 
         # フォルダ作成＆ファイル移動（Windows向け）
         os.makedirs(folder_path, exist_ok=True)
-        subprocess.run(["powershell", "-Command", f"Get-ChildItem -Path . -File -Exclude '.git', '.github', 'versions' | Move-Item -Destination {folder_path}"], check=True)
+        subprocess.run(["powershell", "-Command", f"Get-ChildItem -Path . -File -Exclude '.git', '.github', 'versions' | Move-Item -Destination {folder_path}"])
 
+        # コミットメッセージを一時保存
+        commit_messages.append(f"Move {commit_date} version into {folder_path}")
+
+    # すべての処理が終わったらまとめてコミット＆プッシュ
+    if commit_messages:
         # コミット＆プッシュ
         subprocess.run(["git", "add", "."])
-        subprocess.run(["git", "commit", "-m", f"Move {commit_date} version into {folder_path}"])
-        subprocess.run(["git", "push", "origin", branch_name])
-
-        print(f"✅ {branch_name} pushed successfully!")
-
-        # main/master に戻る
-        subprocess.run(["git", "checkout", "main"])
-
-        # メインブランチに `versions` フォルダが反映されていることを確認
-        subprocess.run(["git", "add", "."])
-        subprocess.run(["git", "commit", "-m", "Add versions directory to main branch"])
+        subprocess.run(["git", "commit", "-m", "\n".join(commit_messages)])
         subprocess.run(["git", "push", "origin", "main"])
+
+        print(f"✅ Changes pushed successfully!")
+
+    # main/master に戻る
+    subprocess.run(["git", "checkout", "main"])
 
 if __name__ == "__main__":
     commits = get_commits()
