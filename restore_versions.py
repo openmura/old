@@ -44,7 +44,7 @@ def process_commits(commits):
         os.makedirs(folder_path, exist_ok=True)
         subprocess.run(["powershell", "-Command", f"Get-ChildItem -Path . -File -Exclude '.git', '.github', 'versions' | Move-Item -Destination {folder_path}"])
 
-        # コミット＆プッシュ（1回のプッシュでまとめて）
+        # コミットをローカルで行う（この時点でまだpushしない）
         subprocess.run(["git", "add", "."])
         subprocess.run(["git", "commit", "-m", f"Move {commit_date} version into {folder_path}"])
 
@@ -52,6 +52,9 @@ def process_commits(commits):
 
         # main/master に戻る
         subprocess.run(["git", "checkout", "main"])
+
+    # 最後に一度だけ main ブランチにプッシュする
+    subprocess.run(["git", "push", "origin", "main"])
 
 if __name__ == "__main__":
     commits = get_commits()
