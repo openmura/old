@@ -28,7 +28,7 @@ def process_commits(commits):
 
         # フォルダ作成＆ファイル移動（Windows向け）
         os.makedirs(folder_path, exist_ok=True)
-        subprocess.run(["powershell", "-Command", f"Get-ChildItem -Path . -File -Exclude '.git', '.github', 'versions' | Move-Item -Destination {folder_path}"])
+        subprocess.run(["powershell", "-Command", f"Get-ChildItem -Path . -File -Exclude '.git', '.github', 'versions' | Move-Item -Destination {folder_path}"], check=True)
 
         # コミット＆プッシュ
         subprocess.run(["git", "add", "."])
@@ -39,7 +39,12 @@ def process_commits(commits):
 
         # main/master に戻る
         subprocess.run(["git", "checkout", "main"])
-    
+
+        # メインブランチに `versions` フォルダが反映されていることを確認
+        subprocess.run(["git", "add", "."])
+        subprocess.run(["git", "commit", "-m", "Add versions directory to main branch"])
+        subprocess.run(["git", "push", "origin", "main"])
+
 if __name__ == "__main__":
     commits = get_commits()
     process_commits(commits)
