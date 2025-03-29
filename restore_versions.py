@@ -33,28 +33,27 @@ def process_commits(commits):
             print(f"❌ Skipping {commit_id}: Commit not found")
             continue
 
-        # 既存のブランチがあれば削除して新たに作成
-        result = subprocess.run(["git", "branch", "--list", branch_name], capture_output=True, text=True)
-        if result.stdout.strip():
-            print(f"⚠️ Branch {branch_name} already exists. Deleting and recreating it.")
-            subprocess.run(["git", "branch", "-D", branch_name])  # 強制的に削除
-        subprocess.run(["git", "checkout", "-b", branch_name, commit_id])  # 新しくブランチ作成
+        # 既存のブランチがない場合のみ新規作成
+        result = subprocess.run(["git", "rev-parse", "--verify", branch_name], capture_output=True)
+        if result.returncode != 0:
+            print(f"⚡ Creating new branch {branch_name}...")
+            subprocess.run(["git", "checkout", "-b", branch_name, commit_id])
+        else:
+            print(f"⚠️ Branch {branch_name} already exists. Switching to it...")
+            subprocess.run(["git", "checkout", branch_name])
 
         # フォルダ作成＆ファイル移動（Windows向け）
         os.makedirs(folder_path, exist_ok=True)
         subprocess.run(["powershell", "-Command", f"Get-ChildItem -Path . -File -Exclude '.git', '.github', 'versions' | Move-Item -Destination {folder_path}"])
 
-        # コミットをローカルで行う（この時点でまだpushしない）
+        # コミット
         subprocess.run(["git", "add", "."])
         subprocess.run(["git", "commit", "-m", f"Move {commit_date} version into {folder_path}"])
-
-        print(f"✅ {branch_name} committed successfully!")
 
         # main/master に戻る
         subprocess.run(["git", "checkout", "main"])
 
-    # 最後に一度だけ main ブランチにプッシュする
-    subprocess.run(["git", "push", "origin", "main"])
+        print(f"✅ {branch_name} created and changes committed!")
 
 if __name__ == "__main__":
     commits = get_commits()
