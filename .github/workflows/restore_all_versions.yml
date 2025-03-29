@@ -1,0 +1,49 @@
+name: Restore All Versions
+
+on:
+  workflow_dispatch:  # 手動実行
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚀 リポジトリをチェックアウト（すべての履歴を取得）
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # すべてのコミット履歴を取得
+
+      - name: 🔍 過去すべてのコミット情報を取得
+        id: get_commits
+        run: |
+          # すべてのコミットIDと日付を取得
+          git log --pretty=format:"%H %ad" --date=short > commits.txt
+          echo "✅ Found $(wc -l < commits.txt) commits"
+
+      - name: 🔄 各コミットをブランチとして作成
+        run: |
+          while IFS=" " read -r commit_id commit_date; do
+            branch_name="version-${commit_date}"
+            folder_path="versions/${branch_name}"
+
+            echo "⏳ Processing $branch_name ($commit_id)..."
+
+            # 新しいブランチを作成
+            git checkout -b "$branch_name" "$commit_id"
+
+            # フォルダを作成し、現在のファイルを移動
+            mkdir -p "$folder_path"
+            find . -mindepth 1 -maxdepth 1 ! -name "versions" ! -name ".git" ! -name ".github" -exec mv {} "$folder_path/" \;
+
+            # コミット＆プッシュ
+            git add .
+            git commit -m "Move $commit_date version into $folder_path"
+            git push origin "$branch_name"
+
+            echo "✅ $branch_name pushed successfully!"
+            
+            # `main` に戻る
+            git checkout main
+          done < commits.txt
+
+      - name: 🎉 完了
+        run: echo "All versions processed!"
