@@ -10,8 +10,8 @@ def get_branches():
     )
     # "HEAD -> main" を除外し、実際のブランチ名だけを取得
     branches = [
-        line.strip().replace("origin/", "") 
-        for line in result.stdout.strip().split("\n") 
+        line.strip().replace("origin/", "")
+        for line in result.stdout.strip().split("\n")
         if "HEAD" not in line  # "HEAD -> main" を除外
     ]
     print("Available branches:", branches)  # ブランチ名を出力してデバッグ
@@ -52,7 +52,7 @@ if __name__ == "__main__":
 
     # main と gh-pages を除外して他のブランチで処理
     branches_to_deploy = [branch for branch in branches if branch != "main" and branch != "gh-pages"]
-    
+
     print("Branches to deploy:", branches_to_deploy)  # デバッグ用
 
     # すべてのブランチに対してデプロイを実行
