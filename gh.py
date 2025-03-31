@@ -2,42 +2,54 @@ import subprocess
 import os
 import shutil
 
-# GitHubのブランチ名を取得
 def get_branches():
     result = subprocess.run(
         ["git", "branch", "--list", "--remote"],
-        capture_output=True, text=True
+        capture_output=True, text=True, check=True
     )
-    # "HEAD -> main" を除外し、実際のブランチ名だけを取得
     branches = [
         line.strip().replace("origin/", "")
         for line in result.stdout.strip().split("\n")
-        if "HEAD" not in line  # "HEAD -> main" を除外
+        if "HEAD" not in line
     ]
-    print("Available branches:", branches)  # ブランチ名を出力してデバッグ
+    print("Available branches:", branches)
     return branches
 
 def deploy_to_github_pages(branch_name):
-    print(f"Deploying branch: {branch_name}")  # デバッグ用
-    # gh-pagesブランチに切り替え
-    subprocess.run(["git", "checkout", "gh-pages"], check=True)
+    print(f"Deploying branch: {branch_name}")
 
-    # 対象のブランチからファイルを取得
-    subprocess.run(["git", "checkout", branch_name, "--", "."], check=True)
+    # gh-pages に切り替え
+    subprocess.run(["git", "switch", "gh-pages"], check=True)
 
-    # サブディレクトリを作成してファイルを移動
+    # 最新の状態を取得
+    subprocess.run(["git", "pull", "origin", "gh-pages"], check=True)
+
+    # サブディレクトリを作成
     version_folder = f"version-{branch_name}"
     os.makedirs(version_folder, exist_ok=True)
 
-    # 現在のディレクトリのファイルをサブディレクトリに移動
-    for item in os.listdir('.'):
-        if item != version_folder and item != ".git" and item != ".github":
-            item_path = os.path.join(os.getcwd(), item)  # 現在のファイルの絶対パスを取得
-            dest_path = os.path.join(os.getcwd(), version_folder, item)  # 移動先の絶対パスを取得
-            if os.path.isdir(item_path):
-                shutil.move(item_path, dest_path)  # ディレクトリを移動
+    # 一時作業ディレクトリを作成
+    temp_dir = f"temp-{branch_name}"
+    if os.path.exists(temp_dir):
+        shutil.rmtree(temp_dir)
+    os.makedirs(temp_dir, exist_ok=True)
+
+    # 対象ブランチをチェックアウト（worktreeを利用）
+    subprocess.run(["git", "worktree", "add", temp_dir, branch_name], check=True)
+
+    # 一時ディレクトリから `version_folder` にコピー
+    for item in os.listdir(temp_dir):
+        if item not in [".git", ".github"]:
+            src_path = os.path.join(temp_dir, item)
+            dest_path = os.path.join(version_folder, item)
+            if os.path.isdir(src_path):
+                shutil.copytree(src_path, dest_path, dirs_exist_ok=True)
             else:
-                shutil.move(item_path, dest_path)  # ファイルを移動
+                shutil.copy2(src_path, dest_path)
+
+    # worktree を削除
+    subprocess.run(["git", "worktree", "remove", temp_dir], check=True)
+    shutil.rmtree(temp_dir, ignore_errors=True)
 
     # 変更をコミット
     subprocess.run(["git", "add", "."], check=True)
@@ -47,26 +59,10 @@ def deploy_to_github_pages(branch_name):
     subprocess.run(["git", "push", "origin", "gh-pages"], check=True)
 
 if __name__ == "__main__":
-    # ブランチリストを取得
     branches = get_branches()
+    branches_to_deploy = [branch for branch in branches if branch not in ["main", "gh-pages"]]
 
-    # main と gh-pages を除外して他のブランチで処理
-    branches_to_deploy = [branch for branch in branches if branch != "main" and branch != "gh-pages"]
+    print("Branches to deploy:", branches_to_deploy)
 
-    print("Branches to deploy:", branches_to_deploy)  # デバッグ用
-
-    # すべてのブランチに対してデプロイを実行
     for branch in branches_to_deploy:
-        # すでに gh-pages にそのブランチがあるか確認
-        try:
-            result = subprocess.run(
-                ["git", "branch", "--list", branch],
-                capture_output=True, text=True
-            )
-            if branch in result.stdout:
-                print(f"Branch {branch} already exists in gh-pages, skipping deployment.")
-                continue  # すでに存在する場合はスキップ
-        except subprocess.CalledProcessError:
-            pass  # エラーが発生した場合は無視
-
         deploy_to_github_pages(branch)
