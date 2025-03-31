@@ -1,17 +1,5 @@
 # レポジトリについて
 これは、HTML,CSS,JavaScriptで構成されています。
-![モックアップ](images/screenshot1.png)
-![モックアップ](images/screenshot2.png)
-## インストール方法
-1. リポジトリをクローン
-   ```bash
-   git clone https://github.com/openmura/home.git
-2. 依存関係をインストール
-   ```bash
-    npm install
-3. プロジェクトを実行
-   ```bash
-    npm start
 ## 使用方法
 - ホームページでルールの確認などを行えます。
 - 他のページへもアクセスすることができます。
@@ -29,4 +17,4 @@ JavaScript
 ## クレジット
 本プロジェクトはkadoによって作成されました。
 ## 重要
-本レポジトリは、2025年3月18日をもって開発を終了します。
+本プロジェクトは、過去のバージョンを振り返る専用です。
