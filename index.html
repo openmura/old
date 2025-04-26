@@ -239,7 +239,7 @@ function setMobileMode() {
   if (window.innerWidth <= 480) {
     frame.style.width = '100%';
     frame.style.maxWidth = '100%';
-    frame.style.height = '600px';
+    frame.style.height = (window.innerHeight * 0.8) + 'px';
   } else {
     frame.style.width = '375px';
     frame.style.maxWidth = '375px';
