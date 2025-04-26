@@ -129,6 +129,13 @@
 <iframe id="archiveFrame"></iframe>
 
 <script>
+window.onload = function(){
+  if (localStorage.getItem("1-v") != true) {
+    alert("古参の人も新参の人も\n\n1周年記念を見てくれてありがと！！");
+    alert("ここでは、過去のwebsiteの更新を見れるよ！！");
+  }
+  localStorage.setItem("1-v","true");
+}
 function loadArchive() {
   const select = document.getElementById('archiveSelect');
   const date = select.value;
