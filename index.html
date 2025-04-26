@@ -1,76 +1,166 @@
 <!DOCTYPE html>
-<html>
-    <head>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>OPENMURA-1周年記念</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f2f5f7;
+      margin: 0;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-    </head>
-    <body>
-        <a href="version/2024-09-04/">2024-09-04</a>
-        <br>
-        <a href="version/2024-09-07/">2024-09-07</a>
-        <br>
-        <a href="version/2024-09-08/">2024-09-08</a>
-        <br>
-        <a href="version/2024-10-20/">2024-10-20</a>
-        <br>
-        <a href="version/2024-12-14/">2024-12-14</a>
-        <br>
-        <a href="version/2024-12-15/">2024-12-15</a>
-        <br>
-        <a href="version/2024-12-16/">2024-12-16</a>
-        <br>
-        <a href="version/2024-12-17/">2024-12-17</a>
-        <br>
-        <a href="version/2024-12-18/">2024-12-18</a>
-        <br>
-        <a href="version/2024-12-19/">2024-12-19</a>
-        <br>
-        <a href="version/2024-12-21/">2024-12-21</a>
-        <br>
-        <a href="version/2024-12-22/">2024-12-22</a>
-        <br>
-        <a href="version/2024-12-23/">2024-12-23</a>
-        <br>
-        <a href="version/2024-12-26/">2024-12-26</a>
-        <br>
-        <a href="version/2024-12-27/">2024-12-27</a>
-        <br>
-        <a href="version/2025-01-11/">2025-01-11</a>
-        <br>
-        <a href="version/2025-01-12/">2025-01-12</a>
-        <br>
-        <a href="version/2025-01-13/">2025-01-13</a>
-        <br>
-        <a href="version/2025-01-16/">2025-01-16</a>
-        <br>
-        <a href="version/2025-01-17/">2025-01-17</a>
-        <br>
-        <a href="version/2025-01-18/">2025-01-18</a>
-        <br>
-        <a href="version/2025-01-19/">2025-01-19</a>
-        <br>
-        <a href="version/2025-01-23/">2025-01-23</a>
-        <br>
-        <a href="version/2025-01-25/">2025-01-25</a>
-        <br>
-        <a href="version/2025-01-26/">2025-01-26</a>
-        <br>
-        <a href="version/2025-01-28/">2025-01-28</a>
-        <br>
-        <a href="version/2025-02-08/">2025-02-08</a>
-        <br>
-        <a href="version/2025-02-09/">2025-02-09</a>
-        <br>
-        <a href="version/2025-02-10/">2025-02-10</a>
-        <br>
-        <a href="version/2025-02-11/">2025-02-11</a>
-        <br>
-        <a href="version/2025-02-12/">2025-02-12</a>
-        <br>
-        <a href="version/2025-02-24/">2025-02-24</a>
-        <br>
-        <a href="version/2025-03-18/">2025-03-18</a>
-        <br>
-        <a href="version/2025-03-30/">2025-03-30</a>
-        <br>
-    </body>
-    </html>
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 2em;
+    }
+
+    .control {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+
+    select {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1em;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      background: #4CAF50;
+      color: white;
+      font-size: 1em;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+
+    button:hover {
+      background: #45a049;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .now {
+      padding: 10px 20px;
+      border: none;
+      background: #4c6faf;
+      color: white;
+      font-size: 1em;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+
+    #message {
+      color: #e53935;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    iframe {
+      width: 100%;
+      max-width: 1000px;
+      height: 600px;
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      background: white;
+    }
+  </style>
+</head>
+<body>
+
+<h1>過去のアーカイブ</h1>
+
+<div class="control">
+  <select id="archiveSelect">
+    <option value="">日付を選んでください</option>
+    <option value="version/2024-09-04/">2024-09-04</option>
+    <option value="version/2024-09-07/">2024-09-07</option>
+    <option value="version/2024-09-08/">2024-09-08</option>
+    <option value="version/2024-10-20/">2024-10-20</option>
+    <option value="version/2024-12-14/">2024-12-14</option>
+    <option value="version/2024-12-15/">2024-12-15</option>
+    <option value="version/2024-12-16/">2024-12-16</option>
+    <option value="version/2024-12-17/">2024-12-17</option>
+    <option value="version/2024-12-18/">2024-12-18</option>
+    <option value="version/2024-12-19/">2024-12-19</option>
+    <option value="version/2024-12-21/">2024-12-21</option>
+    <option value="version/2024-12-22/">2024-12-22</option>
+    <option value="version/2024-12-23/">2024-12-23</option>
+    <option value="version/2024-12-26/">2024-12-26</option>
+    <option value="version/2024-12-27/">2024-12-27</option>
+    <option value="version/2025-01-11/">2025-01-11</option>
+    <option value="version/2025-01-12/">2025-01-12</option>
+    <option value="version/2025-01-13/">2025-01-13</option>
+    <option value="version/2025-01-16/">2025-01-16</option>
+    <option value="version/2025-01-17/">2025-01-17</option>
+    <option value="version/2025-01-18/">2025-01-18</option>
+    <option value="version/2025-01-19/">2025-01-19</option>
+    <option value="version/2025-01-23/">2025-01-23</option>
+    <option value="version/2025-01-25/">2025-01-25</option>
+    <option value="version/2025-01-26/">2025-01-26</option>
+    <option value="version/2025-01-28/">2025-01-28</option>
+    <option value="version/2025-02-08/">2025-02-08 誤作動あり</option>
+    <option value="version/2025-02-09/">2025-02-09 誤作動あり</option>
+    <option value="version/2025-02-10/">2025-02-10 誤作動あり</option>
+    <option value="version/2025-02-11/">2025-02-11</option>
+    <option value="version/2025-02-12/">2025-02-12</option>
+    <option value="version/2025-02-24/">2025-02-24</option>
+    <option value="version/2025-03-18/">2025-03-18</option>
+    <option value="version/2025-03-30/">2025-03-30</option>
+    <option value="https://openmura.github.io/?guestmode">現在</option>
+  </select>
+  <button onclick="loadArchive()">表示</button>
+</div>
+
+<div id="message"></div>
+
+<iframe id="archiveFrame"></iframe>
+
+<script>
+function loadArchive() {
+  const select = document.getElementById('archiveSelect');
+  const date = select.value;
+  const frame = document.getElementById('archiveFrame');
+  const message = document.getElementById('message');
+
+  if (date) {
+    const url = date;
+
+    message.textContent = "";
+    frame.style.display = "none";
+    frame.src = url;
+
+    const tester = document.createElement('iframe');
+    tester.style.display = "none";
+    document.body.appendChild(tester);
+    tester.src = url;
+
+    tester.onload = function() {
+      frame.style.display = "block";
+      tester.remove();
+    };
+    tester.onerror = function() {
+      message.textContent = "指定された日付のデータはありません。";
+      frame.src = "";
+      tester.remove();
+    };
+  } else {
+    alert("日付を選んでください！");
+  }
+}
+</script>
+
+</body>
+</html>
