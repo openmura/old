@@ -13,75 +13,134 @@
       flex-direction: column;
       align-items: center;
     }
-
+  
     h1 {
       color: #333;
       margin-bottom: 20px;
       font-size: 2em;
     }
-
+  
     .control {
       display: flex;
       gap: 10px;
       margin-bottom: 20px;
       align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
     }
-
-    select {
+  
+    select, button {
       padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
       font-size: 1em;
+      border-radius: 8px;
     }
-
+  
+    select {
+      border: 1px solid #ccc;
+    }
+  
     button {
-      padding: 10px 20px;
       border: none;
       background: #4CAF50;
       color: white;
-      font-size: 1em;
-      border-radius: 8px;
       cursor: pointer;
       transition: background 0.3s, box-shadow 0.3s;
     }
-
+  
     button:hover {
       background: #45a049;
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
-
-    .now {
-      padding: 10px 20px;
-      border: none;
-      background: #4c6faf;
-      color: white;
-      font-size: 1em;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.3s, box-shadow 0.3s;
-    }
-
+  
     #message {
       color: #e53935;
       margin-top: 10px;
       font-weight: bold;
     }
-
+  
     iframe {
       width: 100%;
       max-width: 1000px;
-      height: 70%;
+      height: 500px;
       border: 2px solid #ddd;
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.1);
       background: white;
     }
+  
+    @media (max-width: 414px) {
+      body {
+        padding: 20px;
+      }
+  
+      iframe {
+        width: 100%;
+        max-width: 375px;
+        height: 500px;
+      }
+  
+      .control {
+        flex-direction: column;
+      }
+    }
+    .switch-container {
+  position: relative;
+  width: 200px;
+  margin-bottom: 20px;
+}
+
+.switch {
+  display: flex;
+  background: #ddd;
+  border-radius: 30px;
+  overflow: hidden;
+  position: relative;
+}
+
+.switch label {
+  flex: 1;
+  text-align: center;
+  padding: 10px 0;
+  cursor: pointer;
+  z-index: 2;
+  font-size: 1em;
+  color: #333;
+}
+
+.switch-container input[type="radio"] {
+  display: none;
+}
+
+.slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: #2196F3;
+  border-radius: 30px;
+  transition: all 0.3s;
+  z-index: 1;
+}
+
+#mobile:checked ~ .switch .slider {
+  left: 50%;
+}
   </style>
+  
 </head>
 <body>
 
 <h1>過去のアーカイブ</h1>
-
+<div class="switch-container">
+  <input type="radio" name="viewmode" id="pc" checked onclick="setPCMode()">
+  <input type="radio" name="viewmode" id="mobile" onclick="setMobileMode()">
+  <div class="switch">
+    <label for="pc">PC</label>
+    <label for="mobile">スマホ</label>
+    <div class="slider"></div>
+  </div>
+</div>
 <div class="control">
   <select id="archiveSelect">
     <option value="">日付を選んでください</option>
@@ -166,6 +225,19 @@ function loadArchive() {
   } else {
     alert("日付を選んでください！");
   }
+}
+function setPCMode() {
+  const frame = document.getElementById('archiveFrame');
+  frame.style.width = '100%';
+  frame.style.maxWidth = '1000px';
+  frame.style.height = '500px';
+}
+
+function setMobileMode() {
+  const frame = document.getElementById('archiveFrame');
+  frame.style.width = '375px';
+  frame.style.maxWidth = '375px';
+  frame.style.height = '600px';
 }
 </script>
 
